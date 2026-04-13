@@ -19,7 +19,7 @@ gh repo create faceting-angle-finder \
   --remote origin
 
 # 3. Stage and commit
-git add concept.md plan.md todo.md todo-hall.md img/ archive/
+git add .
 git commit -m "Initial project docs: concept, plan, todo, reference images"
 
 # 4. Push
@@ -36,7 +36,6 @@ faceting-angle-finder/
   todo.md                 # this file
   LICENSE                 # MIT or your preference
   img/                    # reference photos
-  archive/                # superseded docs (accel-based build, etc.)
   firmware/
     code.py               # main CircuitPython entry point
     lib/                   # vendored CircuitPython libraries

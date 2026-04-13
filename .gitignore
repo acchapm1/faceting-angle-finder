@@ -1,0 +1,30 @@
+# Claude Code
+.claude/
+
+# Archived / superseded docs (local only)
+archive/
+
+# CircuitPython
+*.pyc
+__pycache__/
+.env
+boot_out.txt
+
+# macOS
+.DS_Store
+._*
+
+# Editors
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# 3D printing intermediates
+*.gcode
+*.bgcode
+
+# Python virtual environments
+.venv/
+venv/

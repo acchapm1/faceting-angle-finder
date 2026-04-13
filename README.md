@@ -31,7 +31,6 @@ firmware/          CircuitPython code (code.py, lib/, boot.py)
 hardware/          Wiring diagram, bill of materials
 enclosure/         3D-printable bracket and display box (STEP + 3MF)
 img/               Reference photos of the mast assembly
-archive/           Superseded docs (accelerometer build, alt hardware)
 ```
 
 ## Status
