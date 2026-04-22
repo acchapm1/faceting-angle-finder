@@ -28,7 +28,7 @@ Will images of the hand piece help?
 
 ## Links
 
-https://wiki.seeedstudio.com/XIAO-RP2040/
-https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/
-https://www.vevor.com/gem-faceting-machine-c_11125/vevor-gem-faceting-machine-180w-jade-grinding-polishing-2980rpm-rock-polisher-p_010173616181
-https://circuitpython.org/
+- https://wiki.seeedstudio.com/XIAO-RP2040/
+- https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/
+- https://www.vevor.com/gem-faceting-machine-c_11125/vevor-gem-faceting-machine-180w-jade-grinding-polishing-2980rpm-rock-polisher-p_010173616181
+- https://circuitpython.org/

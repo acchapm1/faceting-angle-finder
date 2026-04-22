@@ -16,25 +16,27 @@
 
 | # | Part | Approx. | Notes |
 |---|---|---|---|
-| 5 | 3.7V LiPo battery, 1000mAh, JST PH 2-pin | $8-10 | Plugs into Feather battery header, ~15-18 hrs runtime, ~50x30x6mm |
-| 6 | Momentary tactile buttons (x2) | $1 | 6mm through-hole, tare + menu |
-| 7 | Piezo buzzer, passive, 3.3V | $1 | Target-angle alert |
-| 8 | M3x8 socket head screws (x4) | $2 | Sensor bracket + display box assembly |
-| 9 | M3 heat-set inserts (x4) | $1 | Press into PETG printed parts |
+| 5 | M3x8 socket head screws (x4) | $2 | Sensor bracket + display box assembly |
+| 6 | M3 heat-set inserts (x4) | $1 | Press into PETG printed parts |
 
 ## Already have
 
 | Part | Notes |
 |---|---|
 | 2.42" SSD1309 128x64 OLED (HiLetgo, 4-pin I2C) | Display, 71x43mm board, I2C addr 0x3C, SSD1306-compatible driver |
+| 3.7V LiPo battery, 1000mAh, JST PH 2-pin | ~15-18 hrs runtime, ~50x30x6mm |
+| Momentary tactile buttons (x2) | 6mm through-hole, tare + menu |
+| Piezo buzzer, passive, 3.3V | Target-angle alert |
+| SS12D00-G3 slide switches (x2) | SPDT, 0.3A @ 50V — power + buzzer disable. [LCSC C22355741](https://www.lcsc.com/product-detail/C22355741.html) |
+| 5x7 cm double-sided protoboard (x2+) | Carrier boards for OLED + Feather sandwich |
 | XIAO RP2040 | Kept as spare, not used in this build |
 | PETG filament | For 3D-printed enclosures on P1S |
 | Bambu Labs P1S | For printing enclosures |
-| Cyanoacrylate (superglue) or UV-cure adhesive | To bond magnet to axle end |
+| Cyanoacrylate (superglue) or UV-cure adhesive | To bond magnet to handpiece shaft end |
 
 ## Total new spend
 
-~$30-37 (Adafruit parts + battery + generic parts + shipping). Saved $3-5 by using the OLED already on hand.
+~$20-25 (Adafruit parts + M3 hardware + shipping). Saved on OLED, battery, buttons, buzzer, and switches already on hand.
 
 ## Power budget
 

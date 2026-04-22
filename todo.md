@@ -1,32 +1,19 @@
 # Faceting Angle Finder (faf) — TODO
 
-## GitHub Project Setup
+## GitHub Project
 
-**Repo name:** `faceting-angle-finder`
-
-### Create the repo and push
+**Repo:** https://github.com/acchapm1/faceting-angle-finder
 
 ```bash
-# 1. Initialize git in this directory
+# clone
+git clone https://github.com/acchapm1/faceting-angle-finder.git
+
+# or, from the existing local working copy
 cd /Users/acchapm1/tools/acc-2ndbrain/faceting/anglefinder
-git init
-
-# 2. Create the GitHub repo (public, with description)
-gh repo create faceting-angle-finder \
-  --public \
-  --description "Digital angle finder for gem faceting machines — CircuitPython on Feather RP2350 + AS5600 hall-effect rotary encoder" \
-  --source . \
-  --remote origin
-
-# 3. Stage and commit
-git add .
-git commit -m "Initial project docs: concept, plan, todo, reference images"
-
-# 4. Push
-git push -u origin main
+git pull
 ```
 
-### Recommended repo structure (after firmware work begins)
+### Repo structure (evolving as firmware / enclosure work progresses)
 
 ```
 faceting-angle-finder/
@@ -96,22 +83,23 @@ Just say: **"The machine arrived, ready to continue the angle finder build"** an
 
 | # | Part | Approx. | Notes |
 |---|---|---|---|
-| 5 | 3.7V LiPo battery, 1000mAh, JST PH 2-pin | $8–10 | plugs into Feather battery header, ~18 hrs runtime, ~50x30x6mm |
-| ~~6~~ | ~~1.3" SSD1306 OLED~~ | ~~$3–5~~ | ~~replaced by 2.42" SSD1309 already on hand~~ |
-| 7 | Momentary tactile buttons (x2) | $1 | 6mm through-hole, tare + menu |
-| 8 | Piezo buzzer, passive, 3.3V | $1 | target-angle alert |
-| 9 | M3x8 socket head screws (x4) | $2 | sensor bracket + display box assembly |
-| 10 | M3 heat-set inserts (x4) | $1 | press into PETG printed parts |
+| 5 | M3x8 socket head screws (x4) | $2 | sensor bracket + display box assembly |
+| 6 | M3 heat-set inserts (x4) | $1 | press into PETG printed parts |
 
 ### Already have
 
 | Part | Notes |
 |---|---|
 | 2.42" SSD1309 128x64 OLED (HiLetgo, 4-pin I2C) | display, 71x43mm board, I2C addr 0x3C, SSD1306-compatible driver |
+| 3.7V LiPo battery, 1000mAh, JST PH 2-pin | ~18 hrs runtime, ~50x30x6mm |
+| Momentary tactile buttons (x2) | 6mm through-hole, tare + menu |
+| Piezo buzzer, passive, 3.3V | target-angle alert |
+| SS12D00-G3 slide switches (x2) | SPDT, 0.3A/50V — one for battery power, one for buzzer mute |
+| 5x7 cm double-sided protoboard (x2+) | carrier boards for OLED + Feather sandwich layout |
 | XIAO RP2040 | kept as spare — not used in this build |
 | PETG filament | for 3D-printed enclosures on P1S |
 | Bambu Labs P1S | for printing enclosures |
-| Cyanoacrylate (superglue) or UV-cure adhesive | to bond magnet to axle end |
+| Cyanoacrylate (superglue) or UV-cure adhesive | to bond magnet to handpiece shaft end |
 
 ### Optional / future
 
@@ -133,7 +121,7 @@ With a 1000 mAh battery: **~15–18 hours runtime.** Charges in ~5 hours over US
 
 ### Total new spend
 
-~$30–37 (Adafruit parts + battery + generic parts + shipping). Saved $3–5 by using the OLED already on hand.
+~$20–25 (Adafruit parts + M3 hardware + shipping). Saved on OLED, battery, buttons, buzzer, and switches already on hand.
 
 **Does NOT need:** LSM6DS3TR-C, STEMMA QT adapter for MCU (Feather has it built in).
 
@@ -191,7 +179,7 @@ The AS5600 IC is on one side of the breakout PCB. The bracket positions the PCB 
 
 ## Wiring
 
-The Feather RP2350 has a built-in STEMMA QT connector, so the AS5600 plugs in with a single cable. The OLED is hand-wired to the same I2C bus. Buttons and buzzer go to GPIO pins on the Feather header.
+The Feather RP2350 has a built-in STEMMA QT connector, so the AS5600 plugs in with a single cable. The OLED is hand-wired to the same I2C bus. Buttons, buzzer, and slide switches go to GPIO pins / inline on the Feather header.
 
 ```
 Feather RP2350 (#6000) Pinout (relevant pins):
@@ -200,9 +188,10 @@ Feather RP2350 (#6000) Pinout (relevant pins):
   SCL        ── also broken out on header (for hand-wiring OLED)
   D5         ── Tare button (to GND, use internal pullup)
   D6         ── Menu button (to GND, use internal pullup)
-  D9         ── Piezo buzzer (+)
+  D9         ── Piezo buzzer (+) via SS12D00 mute switch
   3V3        ── OLED VCC
   GND        ── common ground
+  BAT        ── LiPo + (via SS12D00 power switch)
 
 I2C bus (shared):
   AS5600    addr 0x36 ─┐  (STEMMA QT cable, no soldering)
@@ -232,12 +221,29 @@ Menu button:
   one leg  → D6
   other leg → GND
 
-Piezo buzzer:
-  (+)  → D9
-  (-)  → GND
+Piezo buzzer (via mute switch):
+  D9             → SS12D00 center (common) pin
+  SS12D00 pin 1  → buzzer (+)        [switch in "sound" position]
+  SS12D00 pin 3  → leave unconnected [switch in "mute" position = open circuit]
+  buzzer (-)     → GND
+  # Alternative: wire both side pins so mute position goes to GND, which clamps
+  # the line more firmly but doesn't change behavior meaningfully.
+
+Power switch (inline on battery +):
+  LiPo JST (+)   → SS12D00 center (common) pin
+  SS12D00 pin 1  → Feather JST battery (+) [switch ON]
+  SS12D00 pin 3  → leave unconnected       [switch OFF]
+  LiPo JST (−)   → Feather JST battery (−) direct
+  # NOTE: When USB-C is plugged in, Feather runs off USB regardless of this
+  # switch. That's desirable — the switch only controls untethered battery use.
+  # Charging still works with the switch OFF (USB → charger → battery directly
+  # is NOT cut by this switch since the switch is between battery and Feather
+  # VBAT, not between charger and battery — double check wiring against your
+  # specific Feather rev before final assembly).
 
 LiPo battery (1000mAh, JST PH 2-pin):
-  Plug into Feather JST battery connector — runs untethered, charges via USB-C automatically
+  Plug into Feather JST battery connector via the SS12D00 power switch above.
+  Charges via USB-C automatically when plugged in.
 ```
 
 ---
@@ -341,32 +347,56 @@ def as5600_status(i2c):
 
 ## Mechanical plan (P1S printed parts)
 
-### Part 1: Sensor bracket
+### Part 1: Handpiece cradle + sensor bracket (split design)
 
-Mounts the AS5600 breakout to the fixed arm, centered over the magnet on the axle end.
+**Design goal:** the handpiece must be removable for close inspection of the gem (since the magnet at the end of the handpiece shaft is what holds the dop), while the AS5600 sensor stays permanently mounted to the arm. Re-inserting the handpiece should not require re-taring.
 
-- Attaches to the fixed arm via a small clamp or set screw.
-- Holds the AS5600 PCB at 1–2 mm air gap above the magnet.
-- Needs a slot or adjustable mount for dialing in the gap.
-- STEMMA QT cable routes from the AS5600 down to the Feather in the display box.
-- Keep it small — must not block the handpiece 0–90° arc.
-- PETG, thin walls are fine since there's no mechanical load.
+**Concept — split V-block cradle:**
 
-### Part 2: Display box
+- The cradle is a two-piece V-block mounted to the arm where the handpiece normally sits.
+- **Bottom half** is a fixed V-groove permanently bolted to the arm. The AS5600 breakout is mounted directly to (or beside) this bottom half, positioned so it will align with the end of the handpiece shaft when the handpiece is seated.
+- **Top half** is a removable cap held by one or two thumbscrews (M3 knurled or a quick-release cam lever). Lifting it releases the handpiece; the sensor and bottom half stay put.
+- When the handpiece is lowered back into the V, the magnet on the shaft's end lands in the same position every time (within ~0.5 mm), well inside the AS5600's tolerance.
+- Locating pin or shoulder at the end of the V constrains axial (in/out) position of the handpiece so the air gap stays consistent.
 
-Clamps to the mast vertical post. Houses Feather RP2350, OLED, buttons, buzzer, and LiPo battery.
+**Magnet location change:**
 
-- OLED board is 71x43mm — this is the largest component and sets the box size. Internal box roughly 80x50x25mm.
-- Feather (51x23mm) and LiPo (~50x30x6mm) stack behind the OLED.
-- OLED window in the front face, buttons accessible on top or side. The 2.42" display gives big, readable digits.
-- STEMMA QT cable exits toward the pivot area (12–15 inches to sensor bracket).
-- USB-C port accessible for charging. When plugged in, the Feather runs from USB and charges the battery simultaneously.
-- Battery sits behind or below the Feather, secured with a small shelf/lip in the printed enclosure.
-- Cable length: 12–15 inches (your measurement).
+- Previously the plan glued the magnet to the pivot axle. Revised: the magnet is glued to the **end of the handpiece shaft** (the end opposite the dop/gem).
+- This way the sensor reads the angle of the handpiece itself — the thing whose angle you actually care about — and removing the handpiece doesn't disturb the sensor.
+- Sensor sits at the "butt" end of the handpiece when cradled, with the 1–2 mm air gap to the magnet.
+
+**Bracket requirements:**
+
+- PETG, moisture resistant for coolant exposure.
+- Air gap adjustment: slot + screw, or a few printed shim washers.
+- Cable management: STEMMA QT cable routes from the sensor along the arm down to the display box.
+- Must clear the full handpiece sweep (0–90°) and not interfere with the protractor scale.
+- Thumbscrew/cam lever on the cap should be operable with gloved/wet hands.
+
+### Part 2: Display box (PCB sandwich)
+
+Clamps to the mast vertical post. Houses Feather RP2350, OLED, buttons, buzzer, slide switches, and LiPo battery, built on two 5x7cm double-sided protoboards in a sandwich layout.
+
+**PCB sandwich layout:**
+
+- **Front board (5x7 cm protoboard):** OLED mounts to the front face. The OLED board (71x43 mm) nearly fills the protoboard — essentially a carrier.
+- **Rear board (5x7 cm protoboard):** Feather RP2350 soldered on. Tactile buttons on top edge, SS12D00 slide switches on one side edge (power) and opposite side or top edge (buzzer mute), piezo buzzer tucked behind. Battery in a pocket behind/below.
+- The two boards are connected by a short ribbon cable or 4-pin header strip carrying SDA, SCL, 3V3, GND to the OLED.
+- Overall box internal dims roughly 80 x 55 x 30 mm to allow the two-board stack plus battery.
+
+**Enclosure features:**
+
+- Window on front face for OLED active area.
+- Cutouts on side/top for tactile buttons (tare, menu).
+- Slots on edges for the two SS12D00 slide switches — labeled "PWR" and "BUZZ".
+- USB-C port accessible for charging (Feather runs from USB and charges battery when plugged in — works regardless of power switch position, see wiring notes).
+- Piezo buzzer vent hole aligned with buzzer body.
+- STEMMA QT cable exits toward the pivot area / arm (12–15 inch run to the sensor cradle).
+- Mast clamp integrated on the back of the enclosure.
 
 ### Part 3: Magnet alignment jig (optional, nice-to-have)
 
-A small disposable printed sleeve that slips over the axle end and centers the 6mm magnet while the glue cures. Ensures the magnet is concentric with the axle. Peel off after curing.
+A small disposable printed sleeve that slips over the handpiece shaft end and centers the 6mm magnet while the glue cures. Ensures the magnet is concentric with the shaft. Peel off after curing.
 
 ---
 
@@ -377,7 +407,10 @@ A small disposable printed sleeve that slips over the axle end and centers the 6
 - [x] Order Feather RP2350 (#6000), AS5600 (#6357) + magnet add-on, STEMMA QT cable from Adafruit
 - [x] Order LiPo battery, buttons, buzzer, magnets from Amazon
 - [x] Have 2.42" SSD1309 OLED on hand (from parts drawer)
-- [ ] Create GitHub repo (see commands above)
+- [x] Have LiPo battery, tactile buttons, piezo buzzer on hand
+- [x] Have SS12D00-G3 SPDT slide switches on hand (x2 — power + buzzer mute)
+- [x] Have 5x7 cm double-sided protoboards on hand (carrier / sandwich layout)
+- [x] Create GitHub repo — https://github.com/acchapm1/faceting-angle-finder
 - [ ] Install CircuitPython on Feather RP2350
 - [ ] Install libraries (`adafruit_ssd1306`, `adafruit_framebuf`, `adafruit_bus_device`)
 - [ ] Write AS5600 I2C driver (code above, or test on breadboard with magnet taped nearby)
@@ -388,16 +421,23 @@ A small disposable printed sleeve that slips over the axle end and centers the 6
 
 ### Machine-in-hand (after delivery)
 
-- [ ] Measure pivot axle end diameter with calipers (for magnet alignment jig)
-- [ ] Measure fixed arm dimensions (for sensor bracket design)
+- [ ] Measure handpiece shaft diameter (butt end) with calipers — sets V-block geometry and magnet jig
+- [ ] Measure handpiece overall length + cradle seating location on arm
+- [ ] Measure the arm's handpiece-mount interface (for split V-block cradle)
 - [ ] Measure mast post diameter (for display box clamp)
-- [ ] Glue diametric magnet centered on axle end, let cure
+- [ ] Glue diametric magnet centered on handpiece shaft butt end, let cure
 - [ ] Check `as5600_status()` — confirm magnet detected, strength OK
-- [ ] Print sensor bracket, mount AS5600 over magnet on fixed arm
+- [ ] Print split V-block cradle (bottom half + removable top cap with thumbscrew)
+- [ ] Mount AS5600 to fixed bottom half of cradle, aligned with handpiece shaft end
+- [ ] Test handpiece removal + re-insertion — verify angle reading is consistent (no re-tare needed)
 - [ ] Adjust air gap — aim for 1–2 mm, check AGC register for optimal signal
+- [ ] Assemble PCB sandwich: OLED on front board, Feather + switches + buttons + buzzer on rear board
+- [ ] Wire SS12D00 power switch inline on battery + lead
+- [ ] Wire SS12D00 mute switch inline between D9 and piezo buzzer
 - [ ] Print display box, mount on mast post
-- [ ] Run cable from sensor bracket to display box
+- [ ] Run STEMMA QT cable from sensor cradle to display box
 - [ ] Tare against protractor at 45°, sweep 0–90°, verify ≤0.5° accuracy
+- [ ] Verify handpiece removal mid-session does not disturb tare
 - [ ] Add target-angle menu + buzzer alert
 - [ ] First real cutting session
 - [ ] Write README.md with photos and build instructions
@@ -407,7 +447,69 @@ A small disposable printed sleeve that slips over the axle end and centers the 6
 
 ## Questions
 
-1. **Which end of the axle is exposed?** From the images it looks like the axle sticks out on the side closest to you (front). Confirm — this determines which side of the fixed arm gets the bracket.
-2. **Axle end diameter?** Rough estimate is fine for now (exact measurement when the machine arrives). Needed for the optional magnet centering jig.
-3. **Fixed arm geometry.** Is the fixed arm a flat plate, a round tube, or a cast block at the pivot area? This determines whether the sensor bracket clamps, screws, or adhesive-mounts to it. Can tell better once you have the machine in hand.
-4. **Clearance behind the protractor.** The AS5600 bracket needs to sit near the axle end without interfering with the protractor scale or the handpiece sweep. Is there ~15–20 mm of clearance on the exposed axle side? (Answer when machine is in hand.)
+1. **Handpiece shaft butt-end geometry.** The magnet now glues to the end of the handpiece shaft (not the pivot axle). Is that end flat, rounded, or threaded? Diameter? Needed for the magnet centering jig and the V-block sensor alignment. (Measure when machine arrives.)
+2. **How does the handpiece currently seat on the arm?** V-groove, round socket, split clamp, or something else? The split cradle design needs to match or replace whatever interface exists.
+3. **Handpiece repeatability.** When you lift and re-seat the handpiece, does it return to the same angle (visually, against the protractor)? If the existing cradle already enforces that, the split-cap design can mimic it; if not, the new cradle needs tighter tolerancing.
+4. **Clearance behind the handpiece butt.** The sensor needs ~15–20 mm behind the handpiece butt end to sit. Is there clearance, or does something (counterweight, arm structure) get in the way at full 0–90° sweep? (Answer when machine is in hand.)
+5. **Mast post diameter** (for display box clamp).
+
+---
+
+## Design revision — 2026-04-22: arm-mounted case
+
+### Decision
+
+All electronics (Feather, OLED, AS5600, battery, buttons, buzzer, switches) now mount to the **arm** (the part attached to the mast that holds the quill cradle), not the mast post itself. The arm swings with the quill's angular motion, so a sensor fixed to the arm reads the arm's angle directly relative to a reference on the mast — or, if the pivot is between the mast and arm, the AS5600 magnet sits on that pivot pin.
+
+### Terminology update
+
+- **Mast** — vertical post
+- **Arm** — the part attached to the mast (was called "fixed arm" in earlier docs)
+- **Quill** — the handpiece that sits in the black cradle on top of the arm and is removed for facet inspection (previously called "handpiece")
+- **Cradle** — the black V-block on top of the arm that holds the quill
+
+### Mast measurement (known)
+
+- [x] Mast post diameter: **15 mm**
+
+### Mechanical changes from previous plan
+
+- Sensor magnet moves from the quill shaft end back to the **quill cradle pivot pin** on the arm. The arm rotates around this pin relative to the mast, which is what sets the cutting angle.
+- The whole electronics case mounts to the **side of the arm** and rides with it through the full angular sweep.
+- Quill remains freely removable from the cradle without disturbing anything — the sensor is nowhere near the quill itself.
+- Display readability: since the case moves with the arm, the OLED orientation relative to the user changes slightly through the sweep. Acceptable — large digits will still be legible.
+- No separate display box on the mast. Single integrated case on the arm.
+
+### Measurements needed before enclosure CAD can start
+
+**Arm geometry (the part in img/mastsideview.jpg attached to the mast):**
+
+- [ ] Arm cross-section at the case mount point — width × height (note shape: rectangular / round / tapered)
+- [ ] Arm length from mast to quill cradle center
+- [ ] Preferred case position along the arm (closer to mast = less vibration; closer to cradle = easier to read)
+- [ ] Which side of the arm the case mounts to (left or right as user faces machine in cutting position)
+- [ ] Clearance around the arm (distance to splash pan, lap, any other obstruction) through full 0–90° quill travel
+
+**Pivot axis (critical for AS5600 magnet placement):**
+
+- [ ] Quill cradle pivot pin diameter
+- [ ] Pivot pin length, and whether either end is exposed / accessible
+- [ ] Distance from pivot pin axis to the side face of the arm where the case mounts
+- [ ] Whether magnet can glue to an exposed pin end, or whether a coupling arm is needed
+
+**Mounting method:**
+
+- [ ] Preferred attachment — non-destructive clamp, set screws, adhesive, or OK to drill/tap the arm
+
+**Range of motion:**
+
+- [ ] Actual angular range the arm sweeps through (e.g. 0° to ~95°)
+- [ ] Any mechanical stops at the extremes
+
+### Next design-phase tasks
+
+- [ ] Caliper all arm dimensions listed above
+- [ ] Photograph arm from side, end, and close-up of pivot pin/cradle (with caliper in frame)
+- [ ] Decide mount side (left/right) based on user handedness and cutting position
+- [ ] User will design the case in CAD given the measurements and the PCB sandwich footprint (roughly 80 × 55 × 30 mm internal for Feather + OLED + battery)
+- [ ] Confirm sensor-to-magnet geometry: AS5600 IC face parallel to magnet face, 0.5–3 mm air gap, centered on pivot axis within ~1 mm
