@@ -6,7 +6,7 @@ Wiring diagrams and bill of materials for the Faceting Angle Finder.
 
 | File | Purpose |
 |---|---|
-| `wiring-diagram.png` | Visual wiring reference (Fritzing or hand-drawn) |
+| `wiring-diagram.md` | ASCII wiring diagrams with labeled pins (block diagram, pin map, I2C bus, power, buttons, buzzer, cable run) |
 | `bom.md` | Full bill of materials with part numbers, sources, and costs |
 
 ## Summary

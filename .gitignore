@@ -28,3 +28,5 @@ boot_out.txt
 # Python virtual environments
 .venv/
 venv/
+
+adafruit-circuitpython-adafruit_feather_rp2350-en_US-10.2.0.uf2

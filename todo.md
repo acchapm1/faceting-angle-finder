@@ -485,7 +485,7 @@ All electronics (Feather, OLED, AS5600, battery, buttons, buzzer, switches) now 
 **Arm geometry (the part in img/mastsideview.jpg attached to the mast):**
 
 - [ ] Arm cross-section at the case mount point — width × height (note shape: rectangular / round / tapered)
-- [ ] Arm length from mast to quill cradle center
+- [ ] Arm length from mast to quill cradle center - 60mm
 - [ ] Preferred case position along the arm (closer to mast = less vibration; closer to cradle = easier to read)
 - [ ] Which side of the arm the case mounts to (left or right as user faces machine in cutting position)
 - [ ] Clearance around the arm (distance to splash pan, lap, any other obstruction) through full 0–90° quill travel
