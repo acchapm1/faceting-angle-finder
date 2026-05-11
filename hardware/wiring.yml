@@ -1,0 +1,196 @@
+# Faceting Angle Finder — WireViz source
+#
+# Render with:
+#   wireviz hardware/wiring.yml
+# Produces wiring.png, wiring.svg, wiring.html, wiring.bom.tsv.
+#
+# Pin numbers below are positional within each connector's pinlabels list
+# (pin 1 = first label, pin 2 = second, etc).
+
+metadata:
+  title: Faceting Angle Finder — Wiring
+  description: Feather RP2350 + AS5600 + SSD1309 OLED + 2 buttons + buzzer + LiPo
+  version: '1.0'
+
+connectors:
+
+  BAT:
+    type: LiPo 3.7V 1000 mAh
+    subtype: JST PH 2-pin
+    pinlabels: [BAT+, BAT-]
+
+  SW_PWR:
+    type: SS12D00-G3 SPDT
+    subtype: PWR slide switch
+    pinlabels: ['ON', COM, 'OFF']
+
+  Feather:
+    type: Adafruit Feather RP2350 (#6000)
+    subtype: header pins
+    pinlabels: [BAT+, BAT-, 3V3, GND, SDA, SCL, D5, D6, D9]
+    notes: |
+      Header SDA/SCL share their I2C net with the STEMMA QT port SDA/SCL
+      on the same PCB. Internal pullups enabled on D5/D6 in firmware.
+
+  Feather_SQT:
+    type: Feather RP2350 STEMMA QT port
+    subtype: JST SH 4-pin (same PCB as Feather)
+    pinlabels: [GND, SDA, SCL, 3V3]
+
+  AS5600:
+    type: AS5600 breakout (#6357)
+    subtype: STEMMA QT port, I2C addr 0x36
+    pinlabels: [GND, SDA, SCL, 3V3]
+    notes: |
+      DIR pad jumpered to GND on breakout (CW count).
+      6mm x 3mm diametric magnet 1-2 mm below IC.
+
+  OLED:
+    type: SSD1309 2.42" 128x64 OLED
+    subtype: 4-pin I2C, addr 0x3C
+    pinlabels: [GND, VCC, SCL, SDA]
+
+  BTN_TARE:
+    type: Tactile switch 6mm
+    subtype: TARE
+    pinlabels: [A, B]
+
+  BTN_MENU:
+    type: Tactile switch 6mm
+    subtype: MENU
+    pinlabels: [A, B]
+
+  SW_BUZZ:
+    type: SS12D00-G3 SPDT
+    subtype: BUZZ slide switch
+    pinlabels: ['ON', COM, 'OFF']
+
+  BUZZER:
+    type: Piezo passive 3.3V
+    pinlabels: ['+', '-']
+
+
+cables:
+
+  STEMMA_QT:
+    category: bundle
+    type: STEMMA QT / Qwiic
+    gauge: 28 AWG
+    length: 0.2
+    colors: [BK, BU, YE, RD]
+    notes: Adafruit #5385 cut to length from 400 mm.
+
+  OLED_HOOKUP:
+    category: bundle
+    gauge: 26 AWG
+    length: 0.08
+    colors: [BK, RD, YE, BU]
+
+  W_TARE:
+    category: bundle
+    gauge: 28 AWG
+    length: 0.08
+    colors: [WH, BK]
+
+  W_MENU:
+    category: bundle
+    gauge: 28 AWG
+    length: 0.08
+    colors: [WH, BK]
+
+  W_D9_BUZZ:
+    gauge: 26 AWG
+    length: 0.05
+    colors: [GN]
+
+  W_BUZZ_PIEZO:
+    gauge: 26 AWG
+    length: 0.05
+    colors: [GN]
+
+  W_PIEZO_GND:
+    gauge: 26 AWG
+    length: 0.05
+    colors: [BK]
+
+  W_BAT_PWR:
+    gauge: 22 AWG
+    length: 0.08
+    colors: [RD]
+
+  W_PWR_FEATHER:
+    gauge: 22 AWG
+    length: 0.06
+    colors: [RD]
+
+  W_BAT_GND:
+    gauge: 22 AWG
+    length: 0.10
+    colors: [BK]
+
+
+connections:
+
+  # ---------- I2C: AS5600 over STEMMA QT cable ----------
+  -
+    - Feather_SQT: [1-4]
+    - STEMMA_QT:   [1-4]
+    - AS5600:      [1-4]
+
+  # ---------- I2C: OLED hand-wired to Feather header ----------
+  # Feather pins: 4=GND, 3=3V3, 6=SCL, 5=SDA
+  # OLED   pins:  1=GND, 2=VCC, 3=SCL, 4=SDA
+  -
+    - Feather:     [4, 3, 6, 5]
+    - OLED_HOOKUP: [1-4]
+    - OLED:        [1-4]
+
+  # ---------- Tare button: D5 -> btn -> GND ----------
+  -
+    - Feather:  [7]   # D5
+    - W_TARE:   [1]
+    - BTN_TARE: [1]
+  -
+    - BTN_TARE: [2]
+    - W_TARE:   [2]
+    - Feather:  [4]   # GND
+
+  # ---------- Menu button: D6 -> btn -> GND ----------
+  -
+    - Feather:  [8]   # D6
+    - W_MENU:   [1]
+    - BTN_MENU: [1]
+  -
+    - BTN_MENU: [2]
+    - W_MENU:   [2]
+    - Feather:  [4]   # GND
+
+  # ---------- Buzzer chain: D9 -> SW_BUZZ.COM, .ON -> BUZZER+, BUZZER- -> GND ----------
+  -
+    - Feather:   [9]   # D9
+    - W_D9_BUZZ: [1]
+    - SW_BUZZ:   [2]   # COM
+  -
+    - SW_BUZZ:      [1]   # ON
+    - W_BUZZ_PIEZO: [1]
+    - BUZZER:       [1]   # +
+  -
+    - BUZZER:      [2]    # -
+    - W_PIEZO_GND: [1]
+    - Feather:     [4]    # GND
+
+  # ---------- Power: BAT+ -> SW_PWR.COM, .ON -> Feather BAT+ ----------
+  -
+    - BAT:       [1]   # BAT+
+    - W_BAT_PWR: [1]
+    - SW_PWR:    [2]   # COM
+  -
+    - SW_PWR:        [1]   # ON
+    - W_PWR_FEATHER: [1]
+    - Feather:       [1]   # BAT+
+
+  # ---------- Power return: BAT- -> Feather BAT- ----------
+  -
+    - BAT:       [2]   # BAT-
+    - W_BAT_GND: [1]
+    - Feather:   [2]   # BAT-

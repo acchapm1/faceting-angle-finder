@@ -1,0 +1,23 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 x 22 AWG	0.24	m	W_BAT_GND, W_BAT_PWR, W_PWR_FEATHER
+2	Cable, 1 x 26 AWG	0.15	m	W_BUZZ_PIEZO, W_D9_BUZZ, W_PIEZO_GND
+3	Connector, AS5600 breakout (#6357), STEMMA QT port, I2C addr 0x36, 4 pins	1		AS5600
+4	Connector, Adafruit Feather RP2350 (#6000), header pins, 9 pins	1		Feather
+5	Connector, Feather RP2350 STEMMA QT port, JST SH 4-pin (same PCB as Feather), 4 pins	1		Feather_SQT
+6	Connector, LiPo 3.7V 1000 mAh, JST PH 2-pin, 2 pins	1		BAT
+7	Connector, Piezo passive 3.3V, 2 pins	1		BUZZER
+8	Connector, SS12D00-G3 SPDT, BUZZ slide switch, 3 pins	1		SW_BUZZ
+9	Connector, SS12D00-G3 SPDT, PWR slide switch, 3 pins	1		SW_PWR
+10	Connector, SSD1309 2.42" 128x64 OLED, 4-pin I2C, addr 0x3C, 4 pins	1		OLED
+11	Connector, Tactile switch 6mm, MENU, 2 pins	1		BTN_MENU
+12	Connector, Tactile switch 6mm, TARE, 2 pins	1		BTN_TARE
+13	Wire, 26 AWG, BK	0.08	m	OLED_HOOKUP
+14	Wire, 26 AWG, BU	0.08	m	OLED_HOOKUP
+15	Wire, 26 AWG, RD	0.08	m	OLED_HOOKUP
+16	Wire, 26 AWG, YE	0.08	m	OLED_HOOKUP
+17	Wire, 28 AWG, BK	0.16	m	W_MENU, W_TARE
+18	Wire, 28 AWG, WH	0.16	m	W_MENU, W_TARE
+19	Wire, STEMMA QT / Qwiic, 28 AWG, BK	0.2	m	STEMMA_QT
+20	Wire, STEMMA QT / Qwiic, 28 AWG, BU	0.2	m	STEMMA_QT
+21	Wire, STEMMA QT / Qwiic, 28 AWG, RD	0.2	m	STEMMA_QT
+22	Wire, STEMMA QT / Qwiic, 28 AWG, YE	0.2	m	STEMMA_QT
