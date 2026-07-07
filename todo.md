@@ -327,11 +327,27 @@ def as5600_status(i2c):
 3. **Filtering**
    - IIR or moving-average filter — the AS5600 is inherently less noisy than an accelerometer so you can use lighter filtering (10–20 samples or α ≈ 0.1).
 
-4. **Tare / zero**
-   - Set handpiece to a known angle on the protractor, press tare.
-   - `offset = known_angle - current_raw_degrees`
-   - `displayed = current_raw_degrees + offset`
-   - Persist to `microcontroller.nvm` or JSON on CIRCUITPY.
+4. **Tare / zero + direction convention** *(REQUIRED — must implement at mount time)*
+   - **Faceting convention:** tare with the quill pointing **straight down** (6 o'clock)
+     = **0.0°**. As the quill swings **clockwise up** toward 9 o'clock, the display
+     reads **0 → +90 positive**. This is the whole usable range of a faceting cut.
+   - **The reading must be POSITIVE going clockwise-up, not negative.** The current
+     firmware uses `signed_delta()` which picks the shortest signed direction, so
+     CW-up may read negative depending on how the magnet ends up oriented. That is
+     the bug to fix.
+   - **Behavior chosen (2026-07-07):** full continuous range, **no clamp**.
+     - 6 o'clock (tare) → 0.0
+     - CW up to 9 o'clock → +90.0
+     - past 9 o'clock → keeps counting (91, 92…)
+     - below straight-down → negative (−1, −2…)
+   - **Implementation:**
+     - Add a `DIRECTION = +1` (or `-1`) constant. `angle = DIRECTION * signed_delta(filtered, tare_offset)`,
+       then unwrap so it's continuous across the whole range instead of folding at ±180.
+     - **Calibrate `DIRECTION` at mount time:** after gluing the magnet, tare at
+       straight-down, tilt the quill clockwise-up a few degrees, and check the sign.
+       If it goes negative, flip `DIRECTION`. (Cannot be determined before the magnet
+       is glued — depends on magnet field orientation + which way the sensor faces.)
+   - Persist tare offset (and DIRECTION once calibrated) to `microcontroller.nvm`.
 
 5. **Display**
    - Large `XX.X°` on top, status line on bottom.
