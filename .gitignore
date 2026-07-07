@@ -29,4 +29,6 @@ boot_out.txt
 .venv/
 venv/
 
-adafruit-circuitpython-adafruit_feather_rp2350-en_US-10.2.0.uf2
+# CircuitPython firmware images — large binaries, re-downloadable from Adafruit
+# (see firmware/README.md for the download URL / version)
+*.uf2
