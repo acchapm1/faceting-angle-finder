@@ -411,13 +411,21 @@ A small disposable printed sleeve that slips over the handpiece shaft end and ce
 - [x] Have SS12D00-G3 SPDT slide switches on hand (x2 — power + buzzer mute)
 - [x] Have 5x7 cm double-sided protoboards on hand (carrier / sandwich layout)
 - [x] Create GitHub repo — https://github.com/acchapm1/faceting-angle-finder
-- [ ] Install CircuitPython on Feather RP2350
-- [ ] Install libraries (`adafruit_ssd1306`, `adafruit_framebuf`, `adafruit_bus_device`)
-- [ ] Write AS5600 I2C driver (code above, or test on breadboard with magnet taped nearby)
-- [ ] Breadboard: plug AS5600 into Feather via STEMMA QT, I2C scan, confirm 0x36 and OLED at 0x3C
-- [ ] Breadboard: read angle while waving a diametric magnet near the sensor — confirm values change
-- [ ] Breadboard: display angle on OLED with large digits
-- [ ] Breadboard: add filter, tare button, buzzer
+- [x] Install CircuitPython on Feather RP2350 (10.2.1)
+- [x] Install libraries (`adafruit_ssd1306`, `adafruit_framebuf`, `adafruit_bus_device`) — vendored in `firmware/lib/`
+- [x] Write AS5600 I2C driver (in `firmware/code.py`)
+- [x] Breadboard: plug AS5600 into Feather via STEMMA QT, I2C scan, confirm 0x36 and OLED at 0x3C
+- [ ] Breadboard: read angle while waving a diametric magnet near the sensor — confirm values change (needs magnet)
+- [x] Breadboard: display angle on OLED with large digits (shows big `0.0`, status line working)
+- [x] Breadboard: add filter, tare button, buzzer — all wired, verified, in firmware
+
+> **Bring-up note (2026-07-07):** Board arrived stuck in safe mode ("core code crashed
+> hard / Heap allocation when VM not running"). Fixed by reflash to CircuitPython 10.2.1
+> + `storage.erase_filesystem()`. All peripherals then verified working: AS5600 (agc 128),
+> OLED text, both buttons toggle clean, buzzer beeps. The crash was transient flash
+> corruption, not a wiring fault — disconnecting peripherals never reproduced it.
+> `font5x8.bin` must live at the CIRCUITPY root for OLED text. `bringup_test.py` kept in
+> `firmware/` for future hardware debugging.
 
 ### Machine-in-hand (after delivery)
 
